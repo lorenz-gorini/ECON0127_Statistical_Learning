@@ -70,13 +70,13 @@ predict(model_a, newdata = test_hiphop, level = 0.95, interval = "prediction")
 model_c <- lm(assaults17 ~ fb_firstperson_shooter_games + fb_hip_hop_music, data = fcbk)
 coef(model_c)
 summary(model_c)
+# WRONG --> We need adj. R^2: 0.3134 --> Accounts for 31.34% of the variation
 
 (test_both <- data.frame(
     fb_firstperson_shooter_games = mean(fcbk$fb_firstperson_shooter_games),
     fb_hip_hop_music = mean(fcbk$fb_hip_hop_music)
 ))
-predict(model_c, newdata = test_both, level = 0.95, interval = "confidence")
-# WRONG --> We need R^2: 0.317 --> Accounts for 31.7% of the variation
+predict(model_c, newdata = test_both, level = 0.95, interval = "prediction")
 
 # TODO: FOR ME: Why is this confidence interval smaller than the other ones, and why is it based on the predictor?
 
