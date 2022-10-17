@@ -93,21 +93,20 @@ var_10_percent
 
 # Question Set 3
 # Construct a linear regression model that uses all continuous variables in the dataset.
-# a) What is the increase in R2
-# relative to the best-performing bivariate linear model?
-# b) Predict the assault rate for a typical zip code (i.e., a zip code for which all variables are centered on
-# their mean) and compute the standard error. What percent of the uncertainty for the predicted value
-# is due to estimation uncertainty?
+# a) What is the increase in R2 relative to the best-performing bivariate linear model?
 
-predictor_cols <- setdiff(colnames(fcbk), c("state", "city", "zip", "assaults17", "sample"))
-
+predictor_cols <- setdiff(colnames(fcbk), c("state", "city", "zip", "assaults17", "sample")) # UNUSED
 model_all <- lm(assaults17 ~ . - state - city - zip - assaults17 - sample, data = fcbk)
+# OR:
+# predictor_cols <- subset(fcbk, select = - c(state, city, zip, sample))
+# model_all <- lm(assaults17 ~ ., data = predictor_cols)
 coef(model_all)
 summary(model_all)
 # Residual standard error: 581.5 on 372 degrees of freedom
 #   (5 observations deleted due to missingness)
 # Multiple R-squared:  0.7573,    Adjusted R-squared:  0.7188
 
+# SO INCREASE: 0.7188 - 0.3134 = 0.4054
 
 # increase predictors
 mod <- lm(assaults17 ~ fb_hip_hop_music + acs_inc25k + acs_pop25_college,
