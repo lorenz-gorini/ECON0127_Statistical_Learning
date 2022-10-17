@@ -7,7 +7,7 @@ dim(fcbk)
 head(fcbk)
 
 # b) What share of the total number of observations is within the state of California?
-nrow(fcbk[fcbk$state == "CA", ])
+nrow(fcbk[fcbk$state == "CA", ]) / nrow(fcbk)
 
 # c) In which zip codes are the most (the least) assaults per capita?
 fcbk_no_na_assault <- fcbk[!is.na(fcbk$assaults17), ]
@@ -22,19 +22,22 @@ zip_max_assault <- fcbk_no_na_assault$zip[which.max(fcbk_no_na_assault$assaults1
 
 # a) Which of the two predictors accounts for more variation in the outcome variable?
 
+# R^2 = how much variation of dependent variable is explained by the independent variable
+# SO... we are just looking for R^2
+
 # assaults17 = target
 # fb_hip_hop_music = predictor
 model_a <- lm(assaults17 ~ fb_hip_hop_music, data = fcbk)
 coef(model_a)
 summary(model_a)
-# --> std = 538.3
+# --> std = 538.3  **WRONG --> We need R^2: 0.314 --> Accounts for 31.4% of the variation**
 
 # assaults17 = target
 # fb_firstperson_shooter_games = predictor
 model_b <- lm(assaults17 ~ fb_firstperson_shooter_games, data = fcbk)
 coef(model_b)
 summary(model_b)
-# --> std = 1881.4
+# --> std = 1881.4  WRONG --> We need R^2: 0.1231 --> Accounts for 12.3% of the variation
 
 # --> SO.. `fb_hip_hop_music` accounts for more variation in the outcome variable
 
@@ -51,8 +54,11 @@ summary(model_b)
 # Confidence interval for the predicted value
 predict(model_b, newdata = test_fps_games, level = 0.95, interval = "prediction")
 # Confidence interval for the expected value
-predict(model_b, newdata = test_fps_games, level = 0.95, interval = "confidence")
-predict(model_a, newdata = test_hiphop, level = 0.95, interval = "confidence")
+# predict(model_b, newdata = test_fps_games, level = 0.95, interval = "confidence") # WRONG
+# WRONG, because the CI of the predicted value is explictly asked
+predict(model_b, newdata = test_fps_games, level = 0.95, interval = "prediction")
+# predict(model_a, newdata = test_hiphop, level = 0.95, interval = "confidence")  # WRONG
+predict(model_a, newdata = test_hiphop, level = 0.95, interval = "prediction")
 
 # c) Construct a model C that leverages both the share of Facebook users interested in Hip Hop music and
 # users interested in first-person shooter games to predict assaults. What is the increase in R2
@@ -70,6 +76,7 @@ summary(model_c)
     fb_hip_hop_music = mean(fcbk$fb_hip_hop_music)
 ))
 predict(model_c, newdata = test_both, level = 0.95, interval = "confidence")
+# WRONG --> We need R^2: 0.317 --> Accounts for 31.7% of the variation
 
 # TODO: FOR ME: Why is this confidence interval smaller than the other ones, and why is it based on the predictor?
 
@@ -79,7 +86,8 @@ predict(model_c, newdata = test_both, level = 0.95, interval = "confidence")
 coef_model_c <- coef(model_c)
 variation_per_unit <- sqrt(
     coef_model_c["fb_firstperson_shooter_games"]**2 + coef_model_c["fb_hip_hop_music"]**2
-)
+) # WRONG: Because the equation is simply: y = a + b1 * x1 + b2 * x2
+#  So if we take a 10% increase in both, it is just a linear sum of the coefficient estimate
 var_10_percent <- variation_per_unit * 0.10
 var_10_percent
 
