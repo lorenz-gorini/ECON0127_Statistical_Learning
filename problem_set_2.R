@@ -1,6 +1,6 @@
 # Question Set 1
 # 1.a
-fcbk <- read.csv("~/UCL/Statistical learning/assignments/data/fcbk.csv")
+fcbk <- read.csv("~/UCL/Statistical learning/ECON0127_Statistical_Learning/data/fcbk.csv")
 # a) How many observations are in the data? How many variables are there?
 
 dim(fcbk)
@@ -108,19 +108,16 @@ summary(model_all)
 
 # SO INCREASE: 0.7188 - 0.3134 = 0.4054
 
-# increase predictors
-mod <- lm(assaults17 ~ fb_hip_hop_music + acs_inc25k + acs_pop25_college,
-    data = fcbk
-)
-coef(mod)
-summary(mod)
+# b) Predict the assault rate for a typical zip code (i.e., a zip code for which all variables are centered on
+# their mean) and compute the standard error. What percent of the uncertainty for the predicted value
+# is due to estimation uncertainty?
 
-library(texreg)
-screenreg(mod)
+avg_all <- apply(predictor_cols, MARGIN = 2, FUN = mean)
+# Since this is a columnar vector, but we want a row vector, we need to transpose it
+avg_all_frame <- as.data.frame(t(avg_all))
 
-# Inference (the initial parenthesis makes R show the output stored in `new`)
-(new <- data.frame(
-    fb_hip_hop_music = c(0.2, 0.4, 0.6),
-    acs_inc25k = mean(fcbk$acs_inc25k),
-    acs_pop25_college = mean(fcbk$acs_pop25_college)
-))
+avg_y0_se <- predict(model_all, newdata = avg_all_frame, se.fit = True)
+# se.fit --> Estimation uncertainty
+# residual.scale --> Fundamental uncertainty
+result <- avg_y0_se$se.fit**2 / (avg_y0_se$se.fit**2 + avg_y0_se$residual.scale**2)
+result
